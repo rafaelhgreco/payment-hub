@@ -1,0 +1,94 @@
+# Infra local do payment-hub
+#   docker compose up -d                          -> postgres + rabbitmq
+#   docker compose --profile quality up -d        -> + sonarqube
+#   docker compose --profile cache up -d          -> + redis
+#   docker compose --profile quality down         -> derruba tudo (volumes ficam)
+
+services:
+  postgres:
+    image: postgres:17
+    container_name: payment-hub-postgres
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-paymenthub}
+      POSTGRES_USER: ${POSTGRES_USER:-paymenthub}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-paymenthub}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-paymenthub} -d ${POSTGRES_DB:-paymenthub}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:4-management
+    container_name: payment-hub-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER:-paymenthub}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-paymenthub}
+    ports:
+      - "5672:5672"     # AMQP
+      - "15672:15672"   # painel de gerenciamento
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 15s
+      timeout: 10s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: payment-hub-redis
+    profiles: ["cache"]
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube-db:
+    image: postgres:17
+    container_name: payment-hub-sonarqube-db
+    profiles: ["quality"]
+    environment:
+      POSTGRES_DB: sonar
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: ${SONAR_DB_PASSWORD:-sonar}
+    volumes:
+      - sonarqube_db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sonar -d sonar"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  sonarqube:
+    image: sonarqube:community
+    container_name: payment-hub-sonarqube
+    profiles: ["quality"]
+    depends_on:
+      sonarqube-db:
+        condition: service_healthy
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: ${SONAR_DB_PASSWORD:-sonar}
+    ports:
+      - "9000:9000"
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  sonarqube_db_data:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
