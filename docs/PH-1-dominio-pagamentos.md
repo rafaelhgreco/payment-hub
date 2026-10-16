@@ -520,12 +520,12 @@ public class PaymentReviewPolicy {
 ```
 
 <!-- file: src/main/java/com/v1/paymenthub/domain/event/PaymentProcessedEvent.java -->
+
 ```java
 package com.v1.paymenthub.domain.event;
 
 import com.v1.paymenthub.domain.model.Money;
 import com.v1.paymenthub.domain.model.Payment;
-import com.v1.paymenthub.domain.model.PaymentId;
 import com.v1.paymenthub.domain.model.PaymentStatus;
 
 import java.time.Instant;
@@ -576,10 +576,10 @@ public record ReceivePaymentCommand(
 ```
 
 <!-- file: src/main/java/com/v1/paymenthub/application/port/in/ReceivePaymentResult.java -->
+
 ```java
 package com.v1.paymenthub.application.port.in;
 
-import com.v1.paymenthub.domain.model.PaymentId;
 import com.v1.paymenthub.domain.model.PaymentStatus;
 
 public record ReceivePaymentResult(
