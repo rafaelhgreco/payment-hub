@@ -6,7 +6,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>4.1.1</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 	<groupId>com.v1</groupId>
 	<artifactId>paymenthub</artifactId>
@@ -35,7 +35,6 @@
 
 	<dependencyManagement>
 		<dependencies>
-			<!-- BOM do Camel: gerencia a versão de todos os camel-*-starter -->
 			<dependency>
 				<groupId>org.apache.camel.springboot</groupId>
 				<artifactId>camel-spring-boot-bom</artifactId>
@@ -162,7 +161,6 @@
 						</goals>
 						<configuration>
 							<annotationProcessorPaths>
-								<!-- Ordem importa: Lombok -> binding -> MapStruct -->
 								<path>
 									<groupId>org.projectlombok</groupId>
 									<artifactId>lombok</artifactId>
