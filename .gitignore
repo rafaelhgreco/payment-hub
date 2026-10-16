@@ -1,0 +1,27 @@
+# Build
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Segredos / ambiente
+.env
+.env.*
+!env.example
+!.env.example
+
+# IDEs
+.idea/
+*.iml
+*.iws
+*.ipr
+.vscode/
+.classpath
+.project
+.settings/
+.apt_generated/
+.factorypath
+.springBeans
+.sts4-cache/
+
+# SO / logs
+.DS_Store
+*.log
